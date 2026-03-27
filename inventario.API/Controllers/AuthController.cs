@@ -8,10 +8,18 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace inventario.API.Controllers
 {
+
     [ApiController]
     [Route("auth")]
     public class AuthController : ControllerBase
     {
+        private readonly IConfiguration _configuration;
+
+        public AuthController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginDTO login)
         {
@@ -19,8 +27,9 @@ namespace inventario.API.Controllers
             if (login.UserName != "admin" || login.Password != "1234")
                 return Unauthorized("Credenciales inválidas");
 
+
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("mi_clave_super_segura_para_jwt_2026_backend");
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

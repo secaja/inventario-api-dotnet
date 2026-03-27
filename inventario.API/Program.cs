@@ -6,17 +6,17 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔥 DB
+//DB
 builder.Services.AddDbContext<InventarioDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 🔥 Controllers
+//Controllers
 builder.Services.AddControllers();
 
-// 🔥 JWT (clave larga)
-var key = Encoding.ASCII.GetBytes("mi_clave_super_segura_para_jwt_2026_backend");
+//JWT
+var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
 
-// 🔥 Auth
+//Auth
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -35,7 +35,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// 🔥 Swagger con JWT
+// Swagger con JWT
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -67,14 +67,14 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// 🔥 Middleware correcto
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication(); // 👈 primero autenticación
-app.UseAuthorization();  // 👈 luego autorización
+app.UseAuthentication();
+app.UseAuthorization();  
 
 app.MapControllers();
 
