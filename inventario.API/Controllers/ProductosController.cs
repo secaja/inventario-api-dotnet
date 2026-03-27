@@ -30,13 +30,43 @@ namespace inventario.API.Controllers
         [HttpPost("movimiento")]
         public async Task<IActionResult> Movimiento([FromBody] MovimientoDTO movimiento)
         {
-            if (string.IsNullOrEmpty(movimiento.Nombre))
-                return BadRequest("El nombre es obligatorio");
+            if (movimiento == null)
+            {
+                return BadRequest(new
+                {
+                    error = true,
+                    mensaje = "El cuerpo de la solicitud es obligatorio"
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(movimiento.Nombre))
+            {
+                return BadRequest(new
+                {
+                    error = true,
+                    mensaje = "El nombre es obligatorio"
+                });
+            }
 
             if (movimiento.Cantidad <= 0)
-                return BadRequest("La cantidad debe ser mayor a 0");
+            {
+                return BadRequest(new
+                {
+                    error = true,
+                    mensaje = "La cantidad debe ser mayor a 0"
+                });
+            }
 
-            var tipo = movimiento.Tipo.ToLower().Trim();
+            var tipo = movimiento.Tipo?.ToLower().Trim();
+
+            if (tipo != "entrada" && tipo != "salida")
+            {
+                return BadRequest(new
+                {
+                    error = true,
+                    mensaje = "Tipo inválido. Usa 'entrada' o 'salida'"
+                });
+            }
 
             var producto = await _context.Productos
                 .FirstOrDefaultAsync(p => p.Nombre == movimiento.Nombre);
@@ -56,21 +86,28 @@ namespace inventario.API.Controllers
             {
                 producto.Cantidad += movimiento.Cantidad;
             }
-            else if (tipo == "salida")
-            {
-                if (producto.Cantidad < movimiento.Cantidad)
-                    return BadRequest("Stock insuficiente");
-
-                producto.Cantidad -= movimiento.Cantidad;
-            }
             else
             {
-                return BadRequest("Tipo inválido (entrada/salida)");
+                if (producto.Cantidad < movimiento.Cantidad)
+                {
+                    return BadRequest(new
+                    {
+                        error = true,
+                        mensaje = "Stock insuficiente"
+                    });
+                }
+
+                producto.Cantidad -= movimiento.Cantidad;
             }
 
             await _context.SaveChangesAsync();
 
-            return Ok(producto);
+            return Ok(new
+            {
+                error = false,
+                mensaje = "Movimiento registrado correctamente",
+                data = producto
+            });
         }
 
         [Authorize]
