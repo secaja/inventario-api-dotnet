@@ -122,7 +122,7 @@ namespace inventario.API.Controllers
             _context.Productos.Remove(producto);
             await _context.SaveChangesAsync();
 
-            return Ok("Producto eliminado");
+            return NoContent();
         }
     }
 }
