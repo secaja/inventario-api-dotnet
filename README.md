@@ -1,5 +1,6 @@
 # Inventario API
-API RESTful para la gestion de inventario, desarrollada con .NET 9, Entity Framework Core y PostgreSQL. Incluye autenticacion mediante JWT.
+API RESTful para la gestion de inventario,
+desarrollada con .NET 9, Entity Framework Core y PostgreSQL. Incluye autenticacion mediante JWT.
 
 ## Tecnologías
 - .NET 9
